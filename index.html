@@ -1,22 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christy</title>
+    <title>Christy's World</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            background-color: #FFE4E1; /* 柔和的粉紅色背景 */
             font-family: Arial, sans-serif;
-            font-size: 48px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #FF69B4;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #FF69B4;
+            border-radius: 8px;
+        }
+
+        .content-display {
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #FF69B4;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #FF1493;
+        }
+
+        #preview {
+            margin-top: 20px;
+        }
+
+        img, video {
+            max-width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    Christy
+    <div class="container">
+        <h1>Christy's World</h1>
+        
+        <div class="upload-section">
+            <h2>分享你的故事</h2>
+            <textarea id="textContent" placeholder="寫下你的想法..."></textarea>
+            
+            <div>
+                <input type="file" id="mediaInput" accept="image/*,video/*" multiple>
+                <button onclick="uploadContent()">發布</button>
+            </div>
+        </div>
+
+        <div class="content-display" id="contentDisplay">
+            <!-- 上傳的內容會顯示在這裡 -->
+        </div>
+    </div>
+
+    <script>
+        function uploadContent() {
+            const text = document.getElementById('textContent').value;
+            const files = document.getElementById('mediaInput').files;
+            const contentDisplay = document.getElementById('contentDisplay');
+
+            // 創建新的內容區塊
+            const newContent = document.createElement('div');
+            newContent.style.marginBottom = '20px';
+            newContent.style.padding = '15px';
+            newContent.style.backgroundColor = '#fff';
+            newContent.style.borderRadius = '8px';
+
+            // 添加文字
+            if (text) {
+                const textElement = document.createElement('p');
+                textElement.textContent = text;
+                newContent.appendChild(textElement);
+            }
+
+            // 添加媒體文件
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    newContent.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.controls = true;
+                    video.src = URL.createObjectURL(file);
+                    newContent.appendChild(video);
+                }
+            });
+
+            // 將新內容添加到顯示區域
+            contentDisplay.insertBefore(newContent, contentDisplay.firstChild);
+
+            // 清空輸入
+            document.getElementById('textContent').value = '';
+            document.getElementById('mediaInput').value = '';
+        }
+    </script>
 </body>
 </html> 
