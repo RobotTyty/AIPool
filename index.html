@@ -255,15 +255,22 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        "prompt": {
-                            "text": prompt
-                        },
-                        "temperature": 0.7,
-                        "top_k": 40,
-                        "top_p": 0.95,
-                        "candidate_count": 1,
-                        "max_output_tokens": 2048,
-                        "stop_sequences": []
+                        "contents": [
+                            {
+                                "role": "user",
+                                "parts": [
+                                    {
+                                        "text": prompt
+                                    }
+                                ]
+                            }
+                        ],
+                        "safetySettings": [
+                            {
+                                "category": "HARM_CATEGORY_HARASSMENT",
+                                "threshold": "BLOCK_NONE"
+                            }
+                        ]
                     })
                 });
 
