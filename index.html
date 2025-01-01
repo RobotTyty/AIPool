@@ -6,7 +6,7 @@
     <title>Christy's World</title>
     <style>
         body {
-            background-color: #FFE4E1; /* 柔和的粉紅色背景 */
+            background-color: #FFE4E1;  /* 預設的粉紅色背景 */
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
@@ -19,7 +19,6 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-left: 60px;
         }
 
         h1 {
@@ -76,10 +75,10 @@
         /* 添加 AI 聊天框的樣式 */
         .ai-chat-section {
             margin: 20px 0;
-            padding: 20px;
+            padding: 15px;
             border: 2px dashed #FF69B4;
             border-radius: 8px;
-            max-width: 600px;
+            max-width: 600px;  /* 改為和 upload-section 一樣的寬度 */
             margin-left: auto;
             margin-right: auto;
         }
@@ -87,9 +86,9 @@
         /* 修改輸入框的樣式 */
         .ai-chat-section textarea {
             width: 100%;
-            height: 100px;
-            margin-bottom: 10px;
-            padding: 10px;
+            height: 80px;
+            margin-bottom: 8px;
+            padding: 8px;
             border: 1px solid #FF69B4;
             border-radius: 4px;
             resize: vertical;
@@ -98,17 +97,17 @@
         /* 修改回應區域的樣式 */
         .ai-response {
             background-color: #fff;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
-            margin-top: 15px;
-            min-height: 200px;
+            margin-top: 10px;
+            min-height: 150px;
             border: 1px solid #FFB6C1;
-            max-height: 600px;
+            max-height: 400px;
             overflow-y: auto;
             width: 100%;
             box-sizing: border-box;
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.5;
         }
 
         /* 修改回應內容的樣式 */
@@ -204,12 +203,12 @@
             left: -300px;
             top: 0;
             width: 300px;
-            height: 100vh; /* 改為 100vh 確保全高 */
-            background-color: rgba(255, 255, 255, 0.95); /* 稍微透明 */
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.95);
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             transition: left 0.3s ease;
             z-index: 1000;
-            padding-top: 60px; /* 為菜單按鈕留出空間 */
+            padding-top: 60px;
         }
 
         .sidebar.active {
@@ -250,9 +249,48 @@
             background-color: #FFB6C1;
             transform: translateX(5px);
         }
+
+        /* 修改標題樣式 */
+        .ai-chat-section h2 {
+            font-size: 18px;  /* 減小標題字體 */
+            margin-bottom: 10px;  /* 減少下邊距 */
+        }
+
+        /* 修改按鈕樣式 */
+        .ai-chat-section button {
+            padding: 8px 15px;  /* 調整按鈕大小 */
+            font-size: 14px;  /* 調整按鈕字體大小 */
+        }
+
+        /* 修改背景更換按鈕樣式 */
+        .bg-change-button {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 1000;
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* 移除這些樣式 */
+        .bg-buttons,
+        .bg-reset-button {
+            display: none;  /* 或者完全刪除這些樣式 */
+        }
     </style>
 </head>
 <body>
+    <input type="file" id="bgImageInput" accept="image/*" style="display: none;">
+    <button class="bg-change-button" onclick="document.getElementById('bgImageInput').click()">
+        更換背景
+    </button>
+    <button class="menu-button" onclick="toggleSidebar()">☰</button>
+
     <div class="container">
         <h1>Christy's World</h1>
         
@@ -280,7 +318,6 @@
     </div>
 
     <!-- 添加側邊欄 -->
-    <button class="menu-button" onclick="toggleSidebar()">☰</button>
     <div class="sidebar" id="sidebar">
         <div class="chat-history-list" id="chatHistoryList">
             <!-- 聊天記錄會在這裡顯示 -->
@@ -880,6 +917,35 @@
                 contentDisplay.innerHTML = '';
             }
         }
+
+        // 修改背景圖片選擇功能
+        document.getElementById('bgImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.body.style.backgroundImage = `url('${e.target.result}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.style.backgroundAttachment = 'fixed';
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                    localStorage.setItem('backgroundImage', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 頁面加載時恢復保存的背景
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedBg = localStorage.getItem('backgroundImage');
+            if (savedBg) {
+                document.body.style.backgroundImage = `url('${savedBg}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundAttachment = 'fixed';
+                document.body.style.backgroundRepeat = 'no-repeat';
+            }
+        });
     </script>
 </body>
 </html> 
