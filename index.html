@@ -934,10 +934,44 @@
             input.click();
         };
 
-        // 添加重置背景的函數
+        // 添加背景圖片選擇功能
+        document.getElementById('bgImageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.body.style.backgroundImage = `url('${e.target.result}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.style.backgroundAttachment = 'fixed';
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                    document.body.style.backgroundColor = 'transparent';
+                    
+                    // 保存背景圖片到 localStorage
+                    localStorage.setItem('backgroundImage', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 頁面加載時恢復背景
+        window.addEventListener('load', function() {
+            const savedBg = localStorage.getItem('backgroundImage');
+            if (savedBg) {
+                document.body.style.backgroundImage = `url('${savedBg}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundAttachment = 'fixed';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundColor = 'transparent';
+            }
+        });
+
+        // 重置背景的函數
         function resetBackground() {
             document.body.style.backgroundImage = 'none';
             document.body.style.backgroundColor = '#FFE4E1';  // 預設的粉紅色背景
+            localStorage.removeItem('backgroundImage');  // 清除保存的背景
         }
     </script>
 </body>
