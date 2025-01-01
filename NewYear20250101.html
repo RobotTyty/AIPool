@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christy's World</title>
+    <style>
+        body {
+            background-color: #FFE4E1; /* 柔和的粉紅色背景 */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-left: 60px;
+        }
+
+        h1 {
+            color: #FF69B4;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #FF69B4;
+            border-radius: 8px;
+        }
+
+        .content-display {
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #FF69B4;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #FF1493;
+        }
+
+        #preview {
+            margin-top: 20px;
+        }
+
+        img, video {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        /* 添加 AI 聊天框的樣式 */
+        .ai-chat-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #FF69B4;
+            border-radius: 8px;
+        }
+
+        .ai-response {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            min-height: 50px; /* 添加最小高度 */
+            border: 1px solid #FFB6C1; /* 添加邊框 */
+        }
+
+        .chat-history {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #FF69B4;
+            border-radius: 8px;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .user-message {
+            background-color: #FFE4E1;
+            margin-left: 20%;
+        }
+
+        .ai-message {
+            background-color: #fff;
+            margin-right: 20%;
+        }
+
+        .message-image {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 10px 0;
+        }
+
+        /* 修改彩虹文字效果的顏色 */
+        .rainbow-text {
+            background-image: linear-gradient(
+                to right,
+                #FF69B4,    /* 粉紅 */
+                #FFB6C1,    /* 淺粉紅 */
+                #DDA0DD,    /* 梅紅色 */
+                #DA70D6,    /* 蘭花紫 */
+                #BA55D3,    /* 中蘭花紫 */
+                #9370DB,    /* 中紫色 */
+                #8A2BE2,    /* 藍紫色 */
+                #FF69B4     /* 回到粉紅 */
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow-move 6s linear infinite; /* 稍微加快動畫速度 */
+        }
+
+        @keyframes rainbow-move {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        /* 添加側邊欄樣式 */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh; /* 改為 100vh 確保全高 */
+            background-color: rgba(255, 255, 255, 0.95); /* 稍微透明 */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            padding-top: 60px; /* 為菜單按鈕留出空間 */
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .menu-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1001;
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .chat-history-list {
+            padding: 20px;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .chat-history-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #FFE4E1;
+            border: 1px solid #FF69B4;
+            transition: all 0.3s ease;
+        }
+
+        .chat-history-item:hover {
+            background-color: #FFB6C1;
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Christy's World</h1>
+        
+        <div class="ai-chat-section">
+            <h2>與 AI 對話</h2>
+            
+            <textarea id="aiPrompt" placeholder="問問 AI..."></textarea>
+            <button onclick="askAI()">發送</button>
+            <div id="aiResponse" class="ai-response"></div>
+        </div>
+
+        <div class="upload-section">
+            <h2>分享你的故事</h2>
+            <textarea id="textContent" placeholder="寫下你的想法..."></textarea>
+            
+            <div>
+                <input type="file" id="mediaInput" accept="image/*,video/*" multiple>
+                <button onclick="uploadContent()">發布</button>
+            </div>
+        </div>
+
+        <div class="content-display" id="contentDisplay">
+            <!-- 上傳的內容會顯示在這裡 -->
+        </div>
+    </div>
+
+    <!-- 添加側邊欄 -->
+    <button class="menu-button" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <div class="chat-history-list" id="chatHistoryList">
+            <!-- 聊天記錄會在這裡顯示 -->
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyDS4YjYyL74roAGDexeDIPXb5Xfc4IfQYw';
+        let chatHistory = [];
+
+        async function askAI() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const responseDiv = document.getElementById('aiResponse');
+            
+            if (!prompt) return;
+            
+            responseDiv.textContent = '思考中...';
+            
+            try {
+                // 使用 Google AI Studio API
+                const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=' + API_KEY, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 2048,
+                            topP: 0.8,
+                            topK: 40
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('API Error Response:', errorData);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('API Success Response:', data);
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const aiResponse = data.candidates[0].content.parts[0].text;
+                    saveChatHistory(prompt, aiResponse);
+                    updateChatDisplay();
+                    
+                    document.getElementById('aiPrompt').value = '';
+                } else {
+                    throw new Error('API 返回的數據格式不正確');
+                }
+            } catch (error) {
+                console.error('Full error details:', error);
+                responseDiv.textContent = '抱歉，出現了錯誤：' + error.message;
+            }
+        }
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateChatDisplay() {
+            const responseDiv = document.getElementById('aiResponse');
+            responseDiv.innerHTML = ''; // 清空回應區域
+            
+            try {
+                // 只在有新回應時顯示
+                if (chatHistory && chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'ai') {
+                    const lastMessage = chatHistory[chatHistory.length - 1];
+                    const textDiv = document.createElement('div');
+                    textDiv.textContent = lastMessage.content || '無回應內容';
+                    
+                    // 為中文文字添加彩虹效果
+                    if (/[\u4e00-\u9fa5]/.test(lastMessage.content)) {
+                        textDiv.className = 'rainbow-text';
+                    }
+                    
+                    responseDiv.appendChild(textDiv);
+                }
+            } catch (error) {
+                console.error('Error updating chat display:', error);
+                responseDiv.textContent = '顯示回應時出現錯誤';
+            }
+        }
+
+        function uploadContent() {
+            const text = document.getElementById('textContent').value;
+            const files = document.getElementById('mediaInput').files;
+            
+            if (!text && files.length === 0) return;
+
+            // 保存到歷史記錄
+            saveStoryHistory(text, files);
+
+            // 原有的顯示邏輯保持不變
+            const contentDisplay = document.getElementById('contentDisplay');
+            const newContent = document.createElement('div');
+            newContent.style.marginBottom = '20px';
+            newContent.style.padding = '15px';
+            newContent.style.backgroundColor = '#fff';
+            newContent.style.borderRadius = '8px';
+
+            // 添加文字
+            if (text) {
+                const textElement = document.createElement('p');
+                textElement.textContent = text;
+                newContent.appendChild(textElement);
+            }
+
+            // 添加媒體文件
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    newContent.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.controls = true;
+                    video.src = URL.createObjectURL(file);
+                    newContent.appendChild(video);
+                }
+            });
+
+            // 將新內容添加到顯示區域
+            contentDisplay.insertBefore(newContent, contentDisplay.firstChild);
+
+            // 清空輸入
+            document.getElementById('textContent').value = '';
+            document.getElementById('mediaInput').value = '';
+        }
+
+        // 修改標題的樣式
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = document.querySelector('h1');
+            title.className = '';
+            
+            const aiChatTitle = document.querySelector('.ai-chat-section h2');
+            if (aiChatTitle) {
+                aiChatTitle.className = 'rainbow-text';
+            }
+
+            // 只更新側邊欄的歷史記錄列表
+            updateChatHistoryList();
+        });
+
+        // 添加側邊欄控制函數
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // 修改聊天記錄保存方式
+        function saveChatHistory(prompt, response) {
+            const timestamp = new Date().toLocaleString();
+            const chatId = Date.now();
+            
+            // 更新當前的 chatHistory
+            chatHistory.push(
+                { role: 'user', content: prompt },
+                { role: 'ai', content: response }
+            );
+
+            const chatSession = {
+                id: chatId,
+                timestamp: timestamp,
+                messages: [
+                    { role: 'user', content: prompt },
+                    { role: 'ai', content: response }
+                ]
+            };
+            
+            try {
+                // 保存到 localStorage
+                const savedChats = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+                savedChats.push(chatSession);
+                localStorage.setItem('chatHistory', JSON.stringify(savedChats));
+                
+                // 更新側邊欄顯示
+                updateChatHistoryList();
+                
+                // 更新當前顯示
+                updateChatDisplay();
+            } catch (error) {
+                console.error('Error saving chat history:', error);
+            }
+        }
+
+        // 更新側邊欄聊天記錄列表
+        function updateChatHistoryList() {
+            const chatHistoryList = document.getElementById('chatHistoryList');
+            const savedStories = JSON.parse(localStorage.getItem('storyHistory') || '[]');
+            const savedChats = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+
+            chatHistoryList.innerHTML = '';
+
+            // 添加分隔標題
+            if (savedChats.length > 0) {
+                const chatTitle = document.createElement('div');
+                chatTitle.style.padding = '10px';
+                chatTitle.style.fontWeight = 'bold';
+                chatTitle.style.color = '#FF69B4';
+                chatTitle.textContent = 'AI 對話記錄';
+                chatHistoryList.appendChild(chatTitle);
+
+                // 添加聊天記錄
+                savedChats.reverse().forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'chat-history-item';
+                    
+                    // 創建記錄內容容器
+                    const contentDiv = document.createElement('div');
+                    contentDiv.style.flex = '1';
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.style.fontSize = '12px';
+                    timestamp.style.color = '#666';
+                    timestamp.textContent = chat.timestamp;
+                    
+                    const preview = document.createElement('div');
+                    preview.style.marginTop = '5px';
+                    preview.textContent = chat.messages[0].content.substring(0, 30) + 
+                        (chat.messages[0].content.length > 30 ? '...' : '');
+                    
+                    contentDiv.appendChild(timestamp);
+                    contentDiv.appendChild(preview);
+                    contentDiv.onclick = () => loadChatSession(chat.id);
+                    
+                    // 創建刪除按鈕
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.style.marginLeft = '10px';
+                    deleteBtn.style.padding = '5px 10px';
+                    deleteBtn.style.background = '#FF69B4';
+                    deleteBtn.style.border = 'none';
+                    deleteBtn.style.borderRadius = '4px';
+                    deleteBtn.style.color = 'white';
+                    deleteBtn.style.cursor = 'pointer';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteChatHistory(chat.id);
+                    };
+
+                    // 使用 flex 布局來排列內容和刪除按鈕
+                    chatItem.style.display = 'flex';
+                    chatItem.style.alignItems = 'center';
+                    chatItem.appendChild(contentDiv);
+                    chatItem.appendChild(deleteBtn);
+                    
+                    chatHistoryList.appendChild(chatItem);
+                });
+            }
+
+            // 添加故事記錄標題和內容，使用相同的模式
+            if (savedStories.length > 0) {
+                // ... 故事記錄的標題部分保持不變 ...
+
+                savedStories.reverse().forEach(story => {
+                    const storyItem = document.createElement('div');
+                    storyItem.className = 'chat-history-item';
+                    storyItem.style.display = 'flex';
+                    storyItem.style.alignItems = 'center';
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.style.flex = '1';
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.style.fontSize = '12px';
+                    timestamp.style.color = '#666';
+                    timestamp.textContent = story.timestamp;
+
+                    const preview = document.createElement('div');
+                    preview.style.marginTop = '5px';
+                    preview.textContent = story.text.substring(0, 30) + 
+                        (story.text.length > 30 ? '...' : '');
+
+                    if (story.media.length > 0) {
+                        const mediaInfo = document.createElement('div');
+                        mediaInfo.style.fontSize = '12px';
+                        mediaInfo.style.color = '#888';
+                        mediaInfo.textContent = `包含 ${story.media.length} 個媒體文件`;
+                        preview.appendChild(mediaInfo);
+                    }
+
+                    contentDiv.appendChild(timestamp);
+                    contentDiv.appendChild(preview);
+                    contentDiv.onclick = () => loadStory(story.id);
+                    
+                    // 添加刪除按鈕
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.style.marginLeft = '10px';
+                    deleteBtn.style.padding = '5px 10px';
+                    deleteBtn.style.background = '#FF69B4';
+                    deleteBtn.style.border = 'none';
+                    deleteBtn.style.borderRadius = '4px';
+                    deleteBtn.style.color = 'white';
+                    deleteBtn.style.cursor = 'pointer';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteStory(story.id);
+                    };
+
+                    storyItem.appendChild(contentDiv);
+                    storyItem.appendChild(deleteBtn);
+                    chatHistoryList.appendChild(storyItem);
+                });
+            }
+        }
+
+        // 載入特定聊天記錄
+        function loadChatSession(chatId) {
+            const savedChats = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            const chat = savedChats.find(c => c.id === chatId);
+            if (chat) {
+                chatHistory = chat.messages;
+                updateChatDisplay();
+                // 載入聊天記錄後關閉側邊欄
+                document.getElementById('sidebar').classList.remove('active');
+                // 清空當前輸入
+                document.getElementById('aiPrompt').value = '';
+            }
+        }
+
+        // 添加新的函數來保存故事記錄
+        function saveStoryHistory(text, mediaFiles) {
+            const timestamp = new Date().toLocaleString();
+            const storyId = Date.now();
+            
+            // 創建故事對象
+            const story = {
+                id: storyId,
+                timestamp: timestamp,
+                text: text,
+                media: [] // 用於存儲媒體文件的 URL
+            };
+
+            // 處理媒體文件
+            Array.from(mediaFiles).forEach(file => {
+                if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                    // 將文件轉換為 URL 並保存
+                    const url = URL.createObjectURL(file);
+                    story.media.push({
+                        type: file.type.startsWith('image/') ? 'image' : 'video',
+                        url: url
+                    });
+                }
+            });
+
+            // 從 localStorage 獲取現有故事
+            const savedStories = JSON.parse(localStorage.getItem('storyHistory') || '[]');
+            savedStories.push(story);
+            localStorage.setItem('storyHistory', JSON.stringify(savedStories));
+
+            // 更新側邊欄
+            updateStoryHistoryList();
+        }
+
+        // 更新故事歷史列表
+        function updateStoryHistoryList() {
+            const chatHistoryList = document.getElementById('chatHistoryList');
+            const savedStories = JSON.parse(localStorage.getItem('storyHistory') || '[]');
+            const savedChats = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+
+            chatHistoryList.innerHTML = '';
+
+            // 添加分隔標題
+            if (savedChats.length > 0) {
+                const chatTitle = document.createElement('div');
+                chatTitle.style.padding = '10px';
+                chatTitle.style.fontWeight = 'bold';
+                chatTitle.style.color = '#FF69B4';
+                chatTitle.textContent = 'AI 對話記錄';
+                chatHistoryList.appendChild(chatTitle);
+
+                // 添加聊天記錄
+                savedChats.reverse().forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'chat-history-item';
+                    
+                    // 創建記錄內容容器
+                    const contentDiv = document.createElement('div');
+                    contentDiv.style.flex = '1';
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.style.fontSize = '12px';
+                    timestamp.style.color = '#666';
+                    timestamp.textContent = chat.timestamp;
+                    
+                    const preview = document.createElement('div');
+                    preview.style.marginTop = '5px';
+                    preview.textContent = chat.messages[0].content.substring(0, 30) + 
+                        (chat.messages[0].content.length > 30 ? '...' : '');
+                    
+                    contentDiv.appendChild(timestamp);
+                    contentDiv.appendChild(preview);
+                    contentDiv.onclick = () => loadChatSession(chat.id);
+                    
+                    // 創建刪除按鈕
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.style.marginLeft = '10px';
+                    deleteBtn.style.padding = '5px 10px';
+                    deleteBtn.style.background = '#FF69B4';
+                    deleteBtn.style.border = 'none';
+                    deleteBtn.style.borderRadius = '4px';
+                    deleteBtn.style.color = 'white';
+                    deleteBtn.style.cursor = 'pointer';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteChatHistory(chat.id);
+                    };
+
+                    // 使用 flex 布局來排列內容和刪除按鈕
+                    chatItem.style.display = 'flex';
+                    chatItem.style.alignItems = 'center';
+                    chatItem.appendChild(contentDiv);
+                    chatItem.appendChild(deleteBtn);
+                    
+                    chatHistoryList.appendChild(chatItem);
+                });
+            }
+
+            // 添加故事記錄標題和內容，使用相同的模式
+            if (savedStories.length > 0) {
+                // ... 故事記錄的標題部分保持不變 ...
+
+                savedStories.reverse().forEach(story => {
+                    const storyItem = document.createElement('div');
+                    storyItem.className = 'chat-history-item';
+                    storyItem.style.display = 'flex';
+                    storyItem.style.alignItems = 'center';
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.style.flex = '1';
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.style.fontSize = '12px';
+                    timestamp.style.color = '#666';
+                    timestamp.textContent = story.timestamp;
+
+                    const preview = document.createElement('div');
+                    preview.style.marginTop = '5px';
+                    preview.textContent = story.text.substring(0, 30) + 
+                        (story.text.length > 30 ? '...' : '');
+
+                    if (story.media.length > 0) {
+                        const mediaInfo = document.createElement('div');
+                        mediaInfo.style.fontSize = '12px';
+                        mediaInfo.style.color = '#888';
+                        mediaInfo.textContent = `包含 ${story.media.length} 個媒體文件`;
+                        preview.appendChild(mediaInfo);
+                    }
+
+                    contentDiv.appendChild(timestamp);
+                    contentDiv.appendChild(preview);
+                    contentDiv.onclick = () => loadStory(story.id);
+                    
+                    // 添加刪除按鈕
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.style.marginLeft = '10px';
+                    deleteBtn.style.padding = '5px 10px';
+                    deleteBtn.style.background = '#FF69B4';
+                    deleteBtn.style.border = 'none';
+                    deleteBtn.style.borderRadius = '4px';
+                    deleteBtn.style.color = 'white';
+                    deleteBtn.style.cursor = 'pointer';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteStory(story.id);
+                    };
+
+                    storyItem.appendChild(contentDiv);
+                    storyItem.appendChild(deleteBtn);
+                    chatHistoryList.appendChild(storyItem);
+                });
+            }
+        }
+
+        // 載入特定故事
+        function loadStory(storyId) {
+            const savedStories = JSON.parse(localStorage.getItem('storyHistory') || '[]');
+            const story = savedStories.find(s => s.id === storyId);
+            if (story) {
+                // 在主界面顯示選中的故事
+                const contentDisplay = document.getElementById('contentDisplay');
+                contentDisplay.innerHTML = '';
+
+                const storyContent = document.createElement('div');
+                storyContent.style.marginBottom = '20px';
+                storyContent.style.padding = '15px';
+                storyContent.style.backgroundColor = '#fff';
+                storyContent.style.borderRadius = '8px';
+
+                // 添加文字
+                if (story.text) {
+                    const textElement = document.createElement('p');
+                    textElement.textContent = story.text;
+                    storyContent.appendChild(textElement);
+                }
+
+                // 添加媒體
+                story.media.forEach(media => {
+                    if (media.type === 'image') {
+                        const img = document.createElement('img');
+                        img.src = media.url;
+                        storyContent.appendChild(img);
+                    } else if (media.type === 'video') {
+                        const video = document.createElement('video');
+                        video.controls = true;
+                        video.src = media.url;
+                        storyContent.appendChild(video);
+                    }
+                });
+
+                contentDisplay.appendChild(storyContent);
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        // 添加刪除聊天記錄的函數
+        function deleteChatHistory(chatId) {
+            if (confirm('確定要刪除這條記錄嗎？')) {
+                const savedChats = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+                const updatedChats = savedChats.filter(chat => chat.id !== chatId);
+                localStorage.setItem('chatHistory', JSON.stringify(updatedChats));
+                updateChatHistoryList();
+            }
+        }
+
+        // 添加刪除故事的函數
+        function deleteStory(storyId) {
+            if (confirm('確定要刪除這個故事嗎？')) {
+                const savedStories = JSON.parse(localStorage.getItem('storyHistory') || '[]');
+                const updatedStories = savedStories.filter(story => story.id !== storyId);
+                localStorage.setItem('storyHistory', JSON.stringify(updatedStories));
+                updateChatHistoryList();
+                
+                // 如果當前顯示的就是被刪除的故事，清空顯示區域
+                const contentDisplay = document.getElementById('contentDisplay');
+                contentDisplay.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html> 
